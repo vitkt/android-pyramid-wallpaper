@@ -24,6 +24,8 @@ import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class BoxView extends View {
@@ -31,8 +33,26 @@ public class BoxView extends View {
 
 	Activity _act;
 	GameSensorManager sensor;
+	GestureDetector detector;
+	GestureDetector.OnDoubleTapListener onDoubleTap = new GestureDetector.OnDoubleTapListener() {
 
-	// AndroidDebugDraw dd;
+		@Override
+		public boolean onSingleTapConfirmed(MotionEvent e) {
+			return false;
+		}
+
+		@Override
+		public boolean onDoubleTapEvent(MotionEvent e) {
+			return false;
+		}
+
+		@Override
+		public boolean onDoubleTap(MotionEvent e) {
+			changeMode();
+			return false;
+		}
+	};
+
 	ArrayList<Body> dynamicBodies;
 	ArrayList<Body> staticBodies;
 
@@ -180,10 +200,9 @@ public class BoxView extends View {
 		dynamicBodies.clear();
 		staticBodies.clear();
 		Vec2 gravity = new Vec2(0.0f, -10.0f);
-		// if(world!=null)
 
 		world = new World(gravity);
-		// create2BoxScene();
+
 		createPyramidScene();
 	}
 
@@ -203,18 +222,64 @@ public class BoxView extends View {
 		// factory.
 		// TODO Auto-generated constructor stub
 
+		detector = new GestureDetector(act,
+				new GestureDetector.OnGestureListener() {
+
+					@Override
+					public boolean onSingleTapUp(MotionEvent e) {
+						// TODO Auto-generated method stub
+						return false;
+					}
+
+					@Override
+					public void onShowPress(MotionEvent e) {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public boolean onScroll(MotionEvent e1, MotionEvent e2,
+							float distanceX, float distanceY) {
+						// TODO Auto-generated method stub
+						return false;
+					}
+
+					@Override
+					public void onLongPress(MotionEvent e) {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public boolean onFling(MotionEvent e1, MotionEvent e2,
+							float velocityX, float velocityY) {
+						// TODO Auto-generated method stub
+						return false;
+					}
+
+					@Override
+					public boolean onDown(MotionEvent e) {
+						// TODO Auto-generated method stub
+						return false;
+					}
+				});
+		detector.setOnDoubleTapListener(onDoubleTap);
 		setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				if (mode == ViewMode.physic)
-					mode = ViewMode.timeLapse;
+				// changeMode();
 			}
 		});
 		gameTimer = new Timer();
 		gameTimer.schedule(tickTask(), 1000 / 60);
 
 	}
+
+	public boolean onTouchEvent(MotionEvent event) {
+		detector.onTouchEvent(event);
+		return true;
+	};
 
 	TimerTask tickTask() {
 		return new TimerTask() {
@@ -349,6 +414,11 @@ public class BoxView extends View {
 			}
 		});
 
+	}
+
+	private void changeMode() {
+		if (mode == ViewMode.physic)
+			mode = ViewMode.timeLapse;
 	}
 
 	int frameNumber = 0;
