@@ -3,7 +3,7 @@ package ru.vitkt.pyramidwallpaper;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import org.jbox2d.common.Vec2;
+
 
 public class FrameStorage {
 	static Stack<Frame> stack = new Stack<Frame>();

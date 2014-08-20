@@ -1,23 +1,18 @@
 package ru.vitkt.pyramidwallpaper;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.jbox2d.callbacks.DebugDraw;
-import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.IViewportTransform;
-import org.jbox2d.common.OBBViewportTransform;
+
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Filter;
+
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
@@ -25,16 +20,11 @@ import org.jbox2d.dynamics.World;
 import ru.vitkt.pyramidwallpaper.FrameStorage.Frame;
 
 import android.app.Activity;
-import android.content.Context;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.View;
-import android.widget.ImageView;
 
 public class BoxView extends View {
 	World world;
@@ -187,6 +177,8 @@ public class BoxView extends View {
 	Timer gameTimer;
 
 	void createWorld() {
+		dynamicBodies.clear();
+		staticBodies.clear();
 		Vec2 gravity = new Vec2(0.0f, -10.0f);
 		// if(world!=null)
 
@@ -217,27 +209,17 @@ public class BoxView extends View {
 			public void onClick(View v) {
 				if (mode == ViewMode.physic)
 					mode = ViewMode.timeLapse;
-				else {
-					// if (FrameStorage.isBegin())
-					mode = ViewMode.physic;
-				}
-
 			}
 		});
-
 		gameTimer = new Timer();
-
 		gameTimer.schedule(tickTask(), 1000 / 60);
-		// d.setSeconds(d.getSeconds()+2);
 
 	}
 
 	TimerTask tickTask() {
 		return new TimerTask() {
-
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				tick();
 			}
 		};
@@ -245,11 +227,10 @@ public class BoxView extends View {
 	}
 
 	Paint p = new Paint();
-	
 
 	@Override
 	public void draw(Canvas canvas) {
-		// TODO Auto-generated method stub
+
 		super.draw(canvas);
 
 		canvas.drawColor(Color.BLACK);
@@ -295,22 +276,18 @@ public class BoxView extends View {
 		int vertexCount = poly.m_count;
 		Vec2[] vertices = new Vec2[vertexCount];
 
-		// Log.i("pyramid", "DRAW CUBE________________________");
 		for (int i = 0; i < vertexCount; ++i) {
 			vertices[i] = Transform.mul(t, poly.m_vertices[i]);
-			// Log.i("pyramid", "vertex"+i+" ="+vertices[i]);
-		}
-		// Log.i("pyramid","______________________");
-		drawCubeFromBoxToView(canvas, vertices, vertexCount);
-		//
-		// m_debugDraw->DrawSolidPolygon(vertices, vertexCount, color);
 
+		}
+
+		drawCubeFromBoxToView(canvas, vertices, vertexCount);
 	}
 
 	private void drawCubeFromBoxToView(Canvas canvas, Vec2[] vertices,
 			int vertexCount) {
 		FrameStorage.BeginAddFigure();
-		// TODO Auto-generated method stub
+
 		int width = getWidth();
 		int height = getHeight();
 		float wk = width / 50f;
@@ -358,7 +335,8 @@ public class BoxView extends View {
 		} else if (mode == ViewMode.timeLapse) {
 			FrameStorage.PopFrame();
 			if (FrameStorage.isBegin()) {
-				// createWorld();
+				createWorld();
+				mode = ViewMode.physic;
 			}
 			gameTimer.schedule(tickTask(), 5);
 		}
@@ -366,7 +344,7 @@ public class BoxView extends View {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
+
 				invalidate();
 			}
 		});
