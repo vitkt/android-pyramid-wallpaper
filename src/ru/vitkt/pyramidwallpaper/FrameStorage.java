@@ -50,12 +50,10 @@ public class FrameStorage {
 		}
 
 		public void EndAddFigure() {
-			// TODO Auto-generated method stub
 			figures.add(currentFigure);
 		}
 
 		public void BeginAddFigure() {
-			// TODO Auto-generated method stub
 			currentFigure=new ArrayList<float[]>();
 		}
 

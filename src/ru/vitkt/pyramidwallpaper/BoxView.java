@@ -30,7 +30,7 @@ public class BoxView extends View {
 	World world;
 
 	Activity _act;
-	AnimalSensor sensor;
+	GameSensorManager sensor;
 
 	// AndroidDebugDraw dd;
 	ArrayList<Body> dynamicBodies;
@@ -187,7 +187,7 @@ public class BoxView extends View {
 		createPyramidScene();
 	}
 
-	public BoxView(Activity act, AnimalSensor _sensor) {
+	public BoxView(Activity act, GameSensorManager _sensor) {
 
 		super(act);
 		dynamicBodies = new ArrayList<Body>();

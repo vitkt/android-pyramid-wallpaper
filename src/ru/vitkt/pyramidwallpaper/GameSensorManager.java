@@ -6,13 +6,13 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-public class AnimalSensor implements SensorEventListener {
+public class GameSensorManager implements SensorEventListener {
 	private Context context;
 
 	private final SensorManager mSensorManager;
 	private final Sensor mAccelerometer;
 
-	public AnimalSensor(Context _context) {
+	public GameSensorManager(Context _context) {
 
 		context = _context;
 
@@ -24,32 +24,10 @@ public class AnimalSensor implements SensorEventListener {
 
 	}
 
-	private int lastProximity = 1;
-	private int lastLight = 300;
-	private float stability = 1.0f;
-	private float unstableValue = 0f;
-
-	int getProximity() {
-		return lastProximity;
-	}
-
-	int getLight() {
-		return lastLight;
-	}
-
-	public float getStability() {
-		return stability;
-	}
-
-	public float getUnstableValue() {
-		return unstableValue;
-	}
-
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
 	}
 
-	
 	private float x;
 
 	private float y;

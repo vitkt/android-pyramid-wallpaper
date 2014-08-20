@@ -14,7 +14,7 @@ protected void onCreate(Bundle savedInstanceState) {
     // Prepare for simulation. Typically we use a time step of 1/60 of a
     // second (60Hz) and 10 iterations. This provides a high quality simulation
     // in most game scenarios.
-	sensor = new AnimalSensor(this);
+	sensor = new GameSensorManager(this);
    setContentView(new BoxView(this, sensor));
 
     // When the world destructor is called, all bodies and joints are freed. This can
@@ -22,7 +22,7 @@ protected void onCreate(Bundle savedInstanceState) {
 
 }
 
-AnimalSensor sensor;
+GameSensorManager sensor;
 @Override
 	protected void onResume() {
 	
