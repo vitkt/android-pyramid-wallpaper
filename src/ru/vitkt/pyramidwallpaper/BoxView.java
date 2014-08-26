@@ -5,6 +5,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.jbox2d.callbacks.QueryCallback;
+import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.PolygonShape;
 
 import org.jbox2d.common.Transform;
@@ -16,6 +18,8 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.MouseJoint;
+import org.jbox2d.dynamics.joints.MouseJointDef;
 
 import ru.vitkt.pyramidwallpaper.FrameStorage.Frame;
 
@@ -24,7 +28,9 @@ import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -53,8 +59,8 @@ public class BoxView extends View {
 		}
 	};
 
-	ArrayList<Body> dynamicBodies;
-	ArrayList<Body> staticBodies;
+	ArrayList<BoxGuiWrapper> dynamicBodies;
+	ArrayList<BoxGuiWrapper> staticBodies;
 
 	void addStaticBody(float x, float y, float w, float h) {
 		Body groundBody;
@@ -75,19 +81,26 @@ public class BoxView extends View {
 		FixtureDef fixtureDefGround = new FixtureDef();
 		fixtureDefGround.shape = groundBox;
 
-		// Set the box density to be non-zero, so it will be dynamic.
 		fixtureDefGround.density = 0.0f;
 
-		// Override the default friction.
 		fixtureDefGround.friction = 0.000f;
 		fixtureDefGround.restitution = 0.5f;
 
-		// Add the shape to the body.
-		// body.createFixture(fixtureDefGround);
-
-		// Add the ground fixture to the ground body.
 		groundBody.createFixture(fixtureDefGround);
-		staticBodies.add(groundBody);
+		staticBodies.add(new BoxGuiWrapper(groundBody, Color.BLACK));
+	}
+
+	private Random massEps = new Random();
+
+	float getMassEps() {
+		return massEps.nextFloat();
+	}
+
+	Random colorRandomizer = new Random();
+
+	int getRandomColor() {
+		return Color.argb(255, colorRandomizer.nextInt(256),
+				colorRandomizer.nextInt(256), colorRandomizer.nextInt(256));
 	}
 
 	void addDynamicBody(float x, float y, float w, float h) {
@@ -121,7 +134,7 @@ public class BoxView extends View {
 
 		// Add the shape to the body.
 		body.createFixture(fixtureDef);
-		dynamicBodies.add(body);
+		dynamicBodies.add(new BoxGuiWrapper(body, Color.GREEN));
 	}
 
 	void create2BoxScene() {
@@ -145,9 +158,12 @@ public class BoxView extends View {
 
 	}
 
+	Body groundB;
+	MouseJoint mj = null;
+
 	void createPyramidScene() {
 		addStaticBody(0f, -30f, 50f, 1f);
-
+		groundB = staticBodies.get(staticBodies.size() - 1).getBody();
 		addStaticBody(0f, 49f, 50f, 1f);
 
 		addStaticBody(10f, 50f, 1f, 80f);
@@ -161,7 +177,7 @@ public class BoxView extends View {
 			PolygonShape shape = new PolygonShape();
 			shape.setAsBox(a, a);
 
-			Vec2 x = new Vec2(-7.0f * k, -10.75f * k);
+			Vec2 x = new Vec2(-14.0f * k, -10.75f * k);
 			Vec2 y;
 			Vec2 deltaX = new Vec2(0.5625f * k, 1.25f * k);
 			Vec2 deltaY = new Vec2(1.125f * k, 0.0f * k);
@@ -177,13 +193,14 @@ public class BoxView extends View {
 
 					FixtureDef fixture = new FixtureDef();
 					fixture.shape = shape;
-					fixture.density = 0.0f;
+					fixture.density = 5.0f;
 					fixture.friction = 0.0f;
 					fixture.restitution = 0.5f;
 
 					// body.createFixture(shape, 5.0f);
 					body.createFixture(fixture);
-					dynamicBodies.add(body);
+					dynamicBodies
+							.add(new BoxGuiWrapper(body, getRandomColor()));
 					y.x += deltaY.x;
 					y.y += deltaY.y;
 				}
@@ -209,68 +226,55 @@ public class BoxView extends View {
 	public BoxView(Activity act, GameSensorManager _sensor) {
 
 		super(act);
-		dynamicBodies = new ArrayList<Body>();
-		staticBodies = new ArrayList<Body>();
+		dynamicBodies = new ArrayList<BoxGuiWrapper>();
+		staticBodies = new ArrayList<BoxGuiWrapper>();
 		sensor = _sensor;
-		// TODO Auto-generated method stub
+
 		p.setColor(Color.BLUE);
-		p.setStrokeWidth(5.0f);
+		p.setStrokeWidth(10.0f);
 		_act = act;
 
 		createWorld();
-		// Define the dynamic body. We set its position and call the body
-		// factory.
-		// TODO Auto-generated constructor stub
 
 		detector = new GestureDetector(act,
 				new GestureDetector.OnGestureListener() {
 
 					@Override
 					public boolean onSingleTapUp(MotionEvent e) {
-						// TODO Auto-generated method stub
+
 						return false;
 					}
 
 					@Override
 					public void onShowPress(MotionEvent e) {
-						// TODO Auto-generated method stub
-
 					}
 
 					@Override
 					public boolean onScroll(MotionEvent e1, MotionEvent e2,
 							float distanceX, float distanceY) {
-						// TODO Auto-generated method stub
 						return false;
 					}
 
 					@Override
 					public void onLongPress(MotionEvent e) {
-						// TODO Auto-generated method stub
-
 					}
 
 					@Override
 					public boolean onFling(MotionEvent e1, MotionEvent e2,
 							float velocityX, float velocityY) {
-						// TODO Auto-generated method stub
+
 						return false;
 					}
 
 					@Override
 					public boolean onDown(MotionEvent e) {
-						// TODO Auto-generated method stub
+
 						return false;
 					}
+
 				});
 		detector.setOnDoubleTapListener(onDoubleTap);
-		setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				// changeMode();
-			}
-		});
 		gameTimer = new Timer();
 		gameTimer.schedule(tickTask(), 1000 / 60);
 
@@ -278,6 +282,58 @@ public class BoxView extends View {
 
 	public boolean onTouchEvent(MotionEvent event) {
 		detector.onTouchEvent(event);
+
+		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+			final Vec2 p = ConvertViewToWorld(event.getX(), event.getY());
+			Log.i("pyramid", "down " + p.x + " " + p.y);
+			// Make a small box.
+			AABB aabb = new AABB();
+			Vec2 d = new Vec2();
+			d.set(0.001f, 0.001f);
+			aabb.lowerBound.x = p.x - d.x;
+			aabb.lowerBound.y = p.y - d.y;
+
+			aabb.upperBound.x = p.x + d.x;
+			aabb.upperBound.y = p.y + d.y;
+
+			// Query the world for overlapping shapes.
+			QueryCallback callback = new QueryCallback() {
+
+				@Override
+				public boolean reportFixture(Fixture m_fixture) {
+
+					Log.i("pyramid", "report");
+
+					Body body = m_fixture.getBody();
+
+					MouseJointDef md = new MouseJointDef();
+
+					md.bodyA = groundB;
+					md.bodyB = body;
+					md.target.set(p);
+
+					md.maxForce = 1000.0f * body.getMass();
+					mj = (MouseJoint) world.createJoint(md);
+					// body.setAwake(true);
+
+					return false;
+				}
+			};
+			world.queryAABB(callback, aabb);
+		} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+			Log.i("pyramid", "move");
+			if (mj != null) {
+				final Vec2 p = ConvertViewToWorld(event.getX(), event.getY());
+				mj.setTarget(p);
+			}
+
+		} else if (event.getAction() == MotionEvent.ACTION_UP) {
+			Log.i("pyramid", "up");
+			if (mj != null)
+				world.destroyJoint(mj);
+		}
+
 		return true;
 	};
 
@@ -298,7 +354,7 @@ public class BoxView extends View {
 
 		super.draw(canvas);
 
-		canvas.drawColor(Color.BLACK);
+		canvas.drawColor(Color.WHITE);
 		if (mode == ViewMode.physic) {
 			drawPhysics(canvas);
 		} else if (mode == ViewMode.timeLapse) {
@@ -312,6 +368,7 @@ public class BoxView extends View {
 		Frame frame = FrameStorage.GetFrame();
 		for (ArrayList<float[]> figure : frame.figures) {
 			for (float[] line : figure) {
+				p.setColor((int) line[4]);
 				canvas.drawLine(line[0], line[1], line[2], line[3], p);
 			}
 		}
@@ -320,23 +377,23 @@ public class BoxView extends View {
 
 	private void drawPhysics(Canvas canvas) {
 		FrameStorage.BeginPushFrame();
-		for (Body body : dynamicBodies) {
-			drawCube(canvas, body);
+		for (BoxGuiWrapper boxWrapper : dynamicBodies) {
+			drawCube(canvas, boxWrapper);
 		}
-		for (Body groundBody : staticBodies) {
-			drawCube(canvas, groundBody);
+		for (BoxGuiWrapper groundBixWrapper : staticBodies) {
+			drawCube(canvas, groundBixWrapper);
 		}
 		FrameStorage.EndPushFrame();
 	}
 
-	private void drawCube(Canvas canvas, Body _body) {
-		Transform t = _body.getTransform();
-		Fixture f = _body.getFixtureList();
-		drawShape(canvas, t, f);
+	private void drawCube(Canvas canvas, BoxGuiWrapper _box) {
+		Transform t = _box.getBody().getTransform();
+		Fixture f = _box.getBody().getFixtureList();
+		drawShape(canvas, t, f, _box.getColor());
 
 	}
 
-	private void drawShape(Canvas canvas, Transform t, Fixture f) {
+	private void drawShape(Canvas canvas, Transform t, Fixture f, int color) {
 		PolygonShape poly = (PolygonShape) f.getShape();
 		int vertexCount = poly.m_count;
 		Vec2[] vertices = new Vec2[vertexCount];
@@ -346,18 +403,21 @@ public class BoxView extends View {
 
 		}
 
-		drawCubeFromBoxToView(canvas, vertices, vertexCount);
+		drawCubeFromBoxToView(canvas, vertices, vertexCount, color);
 	}
 
-	private void drawCubeFromBoxToView(Canvas canvas, Vec2[] vertices,
-			int vertexCount) {
-		FrameStorage.BeginAddFigure();
+	float widthK = 50f;
+	float xoff = 40;
+	float yoff = 30;
 
+	private void drawCubeFromBoxToView(Canvas canvas, Vec2[] vertices,
+			int vertexCount, int color) {
+		FrameStorage.BeginAddFigure();
+		p.setColor(color);
 		int width = getWidth();
 		int height = getHeight();
-		float wk = width / 50f;
-		float xoff = 40;
-		float yoff = 30;
+		float wk = width / widthK;
+
 		for (int i = 0; i < vertexCount - 1; i++) {
 			float sx, sy, ex, ey;
 
@@ -368,7 +428,7 @@ public class BoxView extends View {
 			ey = height - (vertices[i + 1].y + yoff) * wk;
 
 			canvas.drawLine(sx, sy, ex, ey, p);
-			FrameStorage.AddFigureLine(sx, sy, ex, ey);
+			FrameStorage.AddFigureLine(sx, sy, ex, ey, color);
 		}
 
 		float sx, sy, ex, ey;
@@ -380,9 +440,16 @@ public class BoxView extends View {
 		ey = height - (vertices[0].y + yoff) * wk;
 
 		canvas.drawLine(sx, sy, ex, ey, p);
-		FrameStorage.AddFigureLine(sx, sy, ex, ey);
+		FrameStorage.AddFigureLine(sx, sy, ex, ey, color);
 		FrameStorage.EndAddFigure();
 
+	}
+
+	private Vec2 ConvertViewToWorld(float x, float y) {
+		float wk = getWidth() / widthK;
+		// sx = (vertices[i].x + xoff) * wk;
+		// sy = height - (vertices[i].y + yoff) * wk;
+		return new Vec2((x / wk) - xoff, ((y - getHeight()) / (-wk)) - yoff);
 	}
 
 	boolean updateWorld = true;

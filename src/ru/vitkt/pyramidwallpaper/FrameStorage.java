@@ -21,8 +21,8 @@ public class FrameStorage {
 		currentFrame.EndAddFigure();
 	}
 
-	static void AddFigureLine(float sx, float sy, float ex, float ey) {
-		currentFrame.AddFigureLine(sx, sy, ex, ey);
+	static void AddFigureLine(float sx, float sy, float ex, float ey, int c) {
+		currentFrame.AddFigureLine(sx, sy, ex, ey, c);
 	}
 
 	static void EndPushFrame() {
@@ -59,12 +59,13 @@ public class FrameStorage {
 
 		ArrayList<ArrayList<float[]>> figures = new ArrayList<ArrayList<float[]>>();
 		ArrayList<float[]>currentFigure;
-		public void AddFigureLine(float sx, float sy, float ex, float ey) {
-			float[] arr = new float[4];
+		public void AddFigureLine(float sx, float sy, float ex, float ey, int c) {
+			float[] arr = new float[5];
 			arr[0] = sx;
 			arr[1] = sy;
 			arr[2] = ex;
 			arr[3] = ey;
+			arr[4] = c;
 			currentFigure.add(arr);
 
 		}
