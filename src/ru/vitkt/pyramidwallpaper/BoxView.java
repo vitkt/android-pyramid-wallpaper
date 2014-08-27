@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -137,26 +138,6 @@ public class BoxView extends View {
 		dynamicBodies.add(new BoxGuiWrapper(body, Color.GREEN));
 	}
 
-	void create2BoxScene() {
-
-		addStaticBody(0f, 10f, 20f, 10f);
-		addStaticBody(0f, 70f, 20f, 10f);
-
-		addStaticBody(0f, -30f, 50f, 1f);
-
-		addStaticBody(0f, 100f, 50f, 1f);
-
-		addStaticBody(0f, 50f, 1f, 40f);
-
-		addStaticBody(50f, 50f, 1f, 80f);
-
-		addStaticBody(-40f, 50f, 1f, 80f);
-
-		addDynamicBody(-5f, 30f, 2f, 2f);
-
-		addDynamicBody(7f, 30f, 2f, 2f);
-
-	}
 
 	Body groundB;
 	MouseJoint mj = null;
@@ -417,7 +398,16 @@ public class BoxView extends View {
 		int width = getWidth();
 		int height = getHeight();
 		float wk = width / widthK;
-
+		
+		RectF rf = new RectF();
+		
+		rf.left= (vertices[0].x + xoff) * wk;
+		rf.top= height - (vertices[0].y + yoff) * wk;
+		
+		
+		rf.right= (vertices[3].x + xoff) * wk;
+		rf.bottom = height - (vertices[3].y + yoff) * wk;
+		canvas.drawRect(rf, p);
 		for (int i = 0; i < vertexCount - 1; i++) {
 			float sx, sy, ex, ey;
 
@@ -427,9 +417,12 @@ public class BoxView extends View {
 			ex = (vertices[i + 1].x + xoff) * wk;
 			ey = height - (vertices[i + 1].y + yoff) * wk;
 
-			canvas.drawLine(sx, sy, ex, ey, p);
+		//	canvas.drawLine(sx, sy, ex, ey, p);
+			
 			FrameStorage.AddFigureLine(sx, sy, ex, ey, color);
 		}
+		
+		
 
 		float sx, sy, ex, ey;
 
@@ -439,9 +432,11 @@ public class BoxView extends View {
 		ex = (vertices[0].x + xoff) * wk;
 		ey = height - (vertices[0].y + yoff) * wk;
 
-		canvas.drawLine(sx, sy, ex, ey, p);
+		//canvas.drawLine(sx, sy, ex, ey, p);
 		FrameStorage.AddFigureLine(sx, sy, ex, ey, color);
 		FrameStorage.EndAddFigure();
+		
+		
 
 	}
 
