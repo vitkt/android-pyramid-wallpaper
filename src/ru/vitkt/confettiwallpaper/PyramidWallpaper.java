@@ -1,4 +1,4 @@
-package ru.vitkt.pyramidwallpaper;
+package ru.vitkt.confettiwallpaper;
 
 import org.jbox2d.common.Vec2;
 

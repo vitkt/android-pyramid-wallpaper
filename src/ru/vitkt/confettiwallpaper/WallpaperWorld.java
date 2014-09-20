@@ -1,4 +1,4 @@
-package ru.vitkt.pyramidwallpaper;
+package ru.vitkt.confettiwallpaper;
 
 import java.util.ArrayList;
 import java.util.Random;

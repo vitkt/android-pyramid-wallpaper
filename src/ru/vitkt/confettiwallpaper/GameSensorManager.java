@@ -1,4 +1,4 @@
-package ru.vitkt.pyramidwallpaper;
+package ru.vitkt.confettiwallpaper;
 
 import android.content.Context;
 import android.hardware.Sensor;

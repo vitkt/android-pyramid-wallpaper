@@ -1,4 +1,4 @@
-package ru.vitkt.pyramidwallpaper;
+package ru.vitkt.confettiwallpaper;
 
 import java.util.ArrayList;
 
@@ -7,7 +7,7 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Fixture;
 
-import ru.vitkt.pyramidwallpaper.FrameStorage.Frame;
+import ru.vitkt.confettiwallpaper.FrameStorage.Frame;
 
 import android.graphics.Canvas;
 import android.graphics.Color;

@@ -1,5 +1,5 @@
 <resources>
 
-    <string name="app_name">pyramidTest</string>
-
+    <string name="app_name">Confetti Wallpaper</string>
+	<string name="description">Drag`n`drop confetti or tap or double tap!</string>
 </resources>

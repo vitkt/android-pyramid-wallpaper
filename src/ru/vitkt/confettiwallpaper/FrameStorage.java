@@ -1,6 +1,7 @@
-package ru.vitkt.pyramidwallpaper;
+package ru.vitkt.confettiwallpaper;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Stack;
 
 import android.util.Log;
@@ -23,21 +24,37 @@ public class FrameStorage {
 
 	void EndPushFrame() {
 		if (enabled) {
-			
-			stack.push(currentFrame);
-			
-//			if (previousFrame != null) {
-//				if (!previousFrame.equals(currentFrame)) {
-//					stack.push(currentFrame);
-//					previousFrame = currentFrame;
-//				}
-//			}
-//			else
-//			{
-//				stack.push(currentFrame);
-//				previousFrame = currentFrame;
-//			}
+			//Log.i("pyramid", "size = " + stack.size());
+			if (stack.size() <= 1000) {
+				stack.push(currentFrame);
+
+			} else {
+				pushWithDeleting();
+			}
+			// if (previousFrame != null) {
+			// if (!previousFrame.equals(currentFrame)) {
+			// stack.push(currentFrame);
+			// previousFrame = currentFrame;
+			// }
+			// }
+			// else
+			// {
+			// stack.push(currentFrame);
+			// previousFrame = currentFrame;
+			// }
 		}
+	}
+
+	int deleteIndex = 500;
+
+	private void pushWithDeleting() {
+		if (deleteIndex < stack.size()) {
+			stack.remove(deleteIndex);
+			deleteIndex += 2;
+
+		} else
+			deleteIndex = 500;
+		stack.push(currentFrame);
 	}
 
 	void PopFrame() {
@@ -71,6 +88,8 @@ public class FrameStorage {
 		this.enabled = enabled;
 	}
 
+	private int sizeCounter = 0;
+
 	public class Frame {
 		Frame() {
 		}
@@ -78,26 +97,26 @@ public class FrameStorage {
 		@Override
 		public boolean equals(Object o) {
 			if (o instanceof Frame) {
-				
+
 				Frame another = (Frame) o;
 				if (another.figures.size() != figures.size())
 					return false;
 				for (int i = 0; i < figures.size(); i++) {
-					//Log.d("pyramid","comp cycle");
+					// Log.d("pyramid","comp cycle");
 					float[] figure1 = figures.get(i);
 					float[] figure2 = another.figures.get(i);
 					if (figure1.length != figure2.length)
 						return false;
 					for (int j = 0; j < figure1.length; j++) {
-						//Log.d("pyramid","comp cycle2");
+						// Log.d("pyramid","comp cycle2");
 						if (figure1[j] != figure2[j])
 							return false;
 					}
 				}
-				//Log.d("pyramid","comp true");
+				// Log.d("pyramid","comp true");
 				return true;
-			} else
-			{Log.d("pyramid","comp eq super");
+			} else {
+				Log.d("pyramid", "comp eq super");
 				return super.equals(o);
 			}
 		}
@@ -111,6 +130,8 @@ public class FrameStorage {
 			rect[3] = bottom;
 			rect[4] = c;
 			figures.add(rect);
+			sizeCounter += 5;
+			// Log.i("pyramid", "Float size = "+(sizeCounter*4));
 		}
 
 		ArrayList<float[]> figures = new ArrayList<float[]>();

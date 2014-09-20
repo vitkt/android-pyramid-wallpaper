@@ -1,4 +1,4 @@
-package ru.vitkt.pyramidwallpaper;
+package ru.vitkt.confettiwallpaper;
 
 import android.app.Activity;
 import android.os.Bundle;
