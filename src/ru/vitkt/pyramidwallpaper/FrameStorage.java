@@ -3,71 +3,117 @@ package ru.vitkt.pyramidwallpaper;
 import java.util.ArrayList;
 import java.util.Stack;
 
-
+import android.util.Log;
 
 public class FrameStorage {
-	static Stack<Frame> stack = new Stack<Frame>();
-	static Frame currentFrame;
+	Stack<Frame> stack = new Stack<Frame>();
+	Frame currentFrame = null;
+	Frame previousFrame = null;
+	private boolean enabled = true;
 
-	static void BeginPushFrame() {
-		currentFrame = new Frame();
+	void BeginPushFrame() {
+		if (enabled)
+			currentFrame = new Frame();
 	}
 
-	static void BeginAddFigure() {
-		currentFrame.BeginAddFigure();
+	void AddFigureRect(float left, float top, float right, float bottom, int c) {
+		if (enabled)
+			currentFrame.AddFigureRect(left, top, right, bottom, c);
 	}
 
-	static void EndAddFigure() {
-		currentFrame.EndAddFigure();
+	void EndPushFrame() {
+		if (enabled) {
+			
+			stack.push(currentFrame);
+			
+//			if (previousFrame != null) {
+//				if (!previousFrame.equals(currentFrame)) {
+//					stack.push(currentFrame);
+//					previousFrame = currentFrame;
+//				}
+//			}
+//			else
+//			{
+//				stack.push(currentFrame);
+//				previousFrame = currentFrame;
+//			}
+		}
 	}
 
-	static void AddFigureLine(float sx, float sy, float ex, float ey, int c) {
-		currentFrame.AddFigureLine(sx, sy, ex, ey, c);
-	}
-
-	static void EndPushFrame() {
-		stack.push(currentFrame);
-	}
-
-	static void PopFrame() {
-		if (stack.size()==0)
+	void PopFrame() {
+		if (!enabled)
+			return;
+		if (stack.size() == 0)
 			return;
 		stack.pop();
-		if (stack.size()==0)
+		if (stack.size() == 0)
 			return;
 		currentFrame = stack.lastElement();
 	}
-	static boolean isBegin()
-	{
-		return stack.size()==0;
+
+	boolean isBegin() {
+		if (!enabled)
+			return false;
+		return stack.size() == 0;
 	}
-	static Frame GetFrame() {
+
+	Frame GetFrame() {
+		if (!enabled)
+			return null;
 		return currentFrame;
 	}
 
-	public static class Frame {
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public class Frame {
 		Frame() {
 		}
 
-		public void EndAddFigure() {
-			figures.add(currentFigure);
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof Frame) {
+				
+				Frame another = (Frame) o;
+				if (another.figures.size() != figures.size())
+					return false;
+				for (int i = 0; i < figures.size(); i++) {
+					//Log.d("pyramid","comp cycle");
+					float[] figure1 = figures.get(i);
+					float[] figure2 = another.figures.get(i);
+					if (figure1.length != figure2.length)
+						return false;
+					for (int j = 0; j < figure1.length; j++) {
+						//Log.d("pyramid","comp cycle2");
+						if (figure1[j] != figure2[j])
+							return false;
+					}
+				}
+				//Log.d("pyramid","comp true");
+				return true;
+			} else
+			{Log.d("pyramid","comp eq super");
+				return super.equals(o);
+			}
 		}
 
-		public void BeginAddFigure() {
-			currentFigure=new ArrayList<float[]>();
+		public void AddFigureRect(float left, float top, float right,
+				float bottom, int c) {
+			float[] rect = new float[5];
+			rect[0] = left;
+			rect[1] = top;
+			rect[2] = right;
+			rect[3] = bottom;
+			rect[4] = c;
+			figures.add(rect);
 		}
 
-		ArrayList<ArrayList<float[]>> figures = new ArrayList<ArrayList<float[]>>();
-		ArrayList<float[]>currentFigure;
-		public void AddFigureLine(float sx, float sy, float ex, float ey, int c) {
-			float[] arr = new float[5];
-			arr[0] = sx;
-			arr[1] = sy;
-			arr[2] = ex;
-			arr[3] = ey;
-			arr[4] = c;
-			currentFigure.add(arr);
-
-		}
+		ArrayList<float[]> figures = new ArrayList<float[]>();
+		float[] currentFigure;
 	}
 }
